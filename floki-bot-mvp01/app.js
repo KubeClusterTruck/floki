@@ -81,3 +81,11 @@ bot.dialog('CancelDialog',
     matches: 'Cancel'
 })
 
+bot.dialog('K8sHelpDialog',
+    (session) => {
+        session.send('You reached the K8S Help intent. You said \'%s\'.', session.message.text);
+        session.endDialog();
+    }
+).triggerAction({
+    matches: 'OnDevice.Help'
+})
