@@ -57,15 +57,14 @@ var qnaAppId = process.env.QnaAppId;
 var qnaAPIKey = process.env.QnaAPIKey;
 var qnaAPIEndpoint = process.env.QnaAPIEndpoint;
 
-const QnaKnbUrl = 'https://' + qnaAPIEndpoint + '/knowledgebases/' + qnaAppId + '/generateAnswer';
-const TestKnbUrl = 'https://floki-k8s-knb.azurewebsites.net/qnamaker/knowledgebases/122ad4d8-a3ef-4077-92f3-3e67c7365dbd/generateAnswer';
+const QnaKnbUrl = qnaAPIEndpoint + '/knowledgebases/' + qnaAppId + '/generateAnswer';
 
 // Create QnA Recognizer for use with Luis
-var qnaRecognizer = new cog.QnAMakerRecognizer({
-    knowledgeBaseId: qnaAppId,
-    authKey: qnaAPIKey,
-    endpointHostName: qnaAPIEndpoint
-});  
+//var qnaRecognizer = new cog.QnAMakerRecognizer({
+//    knowledgeBaseId: qnaAppId,
+//    authKey: qnaAPIKey,
+//    endpointHostName: qnaAPIEndpoint
+//});  
 
 // Add both Luis Recognizer
 bot.recognizer(recognizer);
@@ -103,7 +102,7 @@ bot.dialog('K8sHelpDialog',
     (session) => {
         session.send('You reached the K8S Help intent. You said \'%s\'.', session.message.text);
         var query = session.message.text;       
-        cog.QnAMakerRecognizer.recognize(query, TestQnaKnbUrl, qnaAPIKey, 'EndpointKey', 1, 'OnDevice.Help', (error, results) => {
+        cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, qnaAPIKey, 'EndpointKey', 1, 'OnDevice.Help', (error, results) => {
             session.send(results.answers[0].answer)    
         });   
         session.endDialog();
