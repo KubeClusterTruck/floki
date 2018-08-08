@@ -51,7 +51,6 @@ const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v2.0/apps/' + luisApp
 
 // Create a recognizer that gets intents from LUIS, and add it to the bot
 var recognizer = new builder.LuisRecognizer(LuisModelUrl);
-bot.recognizer(recognizer);
 
 // QnA Maker Integration fields
 var qnaAppId = process.env.QnaAppId;
@@ -63,8 +62,12 @@ const QnaKnbUrl = 'https://' + qnaAPIEndpoint + '/knowledgebases/' + qnaAppId + 
 // Create QnA Recognizer for use with Luis
 var qnaRecognizer = new cog.QnAMakerRecognizer({
     knowledgeBaseId: qnaAppId,
-    subscriptionKey: qnaAPIKey
+    subscriptionKey: qnaAPIKey,
+    top: 4
 }); 
+
+// Add both Luis and Qna Recognizers
+bot.recognizer(recognizer, qnaRecognizer);
 
 // Add a dialog for each intent that the LUIS app recognizes.
 // See https://docs.microsoft.com/en-us/bot-framework/nodejs/bot-builder-nodejs-recognize-intent-luis 
@@ -98,12 +101,23 @@ bot.dialog('CancelDialog',
 bot.dialog('K8sHelpDialog',
     (session) => {
         session.send('You reached the K8S Help intent. You said \'%s\'.', session.message.text);
-        var query = session.message.text;        
-        cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, qnaAPIKey, 1, 'OnDevice.Help', (error, results) => {
-            session.send(results.answers[0].answer)    
-        });   
+//        var query = session.message.text;       
+//        cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, qnaAPIKey, 1, 'OnDevice.Help', (error, results) => {
+//            session.send(results.answers[0].answer)    
+//        });   
         session.endDialog();
     }
 ).triggerAction({
     matches: 'OnDevice.Help'
+})
+
+bot.dialog('QnalDialog',
+    (session, args, next) => {
+        session.send('You reached the Qna intent. You said \'%s\'.', session.message.text);
+        var answerEntity = builder.EntityRecognizer.findEntity(args.entities, 'answer');
+        session.send(answerEntity.entity);
+        session.endDialog();
+    }
+).triggerAction({
+    matches: 'qna'
 })
