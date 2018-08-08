@@ -5,6 +5,7 @@ A simple Language Understanding (LUIS) bot for the Microsoft Bot Framework.
 var restify = require('restify');
 var builder = require('botbuilder');
 var botbuilder_azure = require("botbuilder-azure");
+var cog = require('botbuilder-cognitiveservices');
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -52,6 +53,19 @@ const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v2.0/apps/' + luisApp
 var recognizer = new builder.LuisRecognizer(LuisModelUrl);
 bot.recognizer(recognizer);
 
+// QnA Maker Integration fields
+var qnaAppId = process.env.QnaAppId;
+var qnaAPIKey = process.env.QnaAPIKey;
+var qnaAPIEndpoint = process.env.QnaAPIEndpoint;
+
+const QnaKnbUrl = 'https://' + qnaAPIEndpoint + '/knowledgebases/' + qnaAppId + '/generateAnswer';
+
+// Create QnA Recognizer for use with Luis
+var qnaRecognizer = new cog.QnAMakerRecognizer({
+    knowledgeBaseId: qnaAppId,
+    subscriptionKey: qnaAPIKey
+}); 
+
 // Add a dialog for each intent that the LUIS app recognizes.
 // See https://docs.microsoft.com/en-us/bot-framework/nodejs/bot-builder-nodejs-recognize-intent-luis 
 bot.dialog('GreetingDialog',
@@ -84,6 +98,10 @@ bot.dialog('CancelDialog',
 bot.dialog('K8sHelpDialog',
     (session) => {
         session.send('You reached the K8S Help intent. You said \'%s\'.', session.message.text);
+        var query = session.message.text;        
+        cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, qnaAPIKey, 1, 'OnDevice.Help', (error, results) => {
+            session.send(results.answers[0].answer)    
+        })   
         session.endDialog();
     }
 ).triggerAction({
