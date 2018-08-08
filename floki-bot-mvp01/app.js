@@ -101,7 +101,7 @@ bot.dialog('K8sHelpDialog',
         var query = session.message.text;        
         cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, qnaAPIKey, 1, 'OnDevice.Help', (error, results) => {
             session.send(results.answers[0].answer)    
-        })   
+        });   
         session.endDialog();
     }
 ).triggerAction({
