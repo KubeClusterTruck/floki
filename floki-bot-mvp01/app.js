@@ -102,8 +102,13 @@ bot.dialog('K8sHelpDialog',
     (session) => {
         session.send('You reached the K8S Help intent. You said \'%s\'.', session.message.text);
         var query = session.message.text;       
-        cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, qnaAPIKey, 'EndpointKey', 1, 'OnDevice.Help', (error, results) => {
-            session.send(results.answers[0].answer)    
+        cog.QnAMakerRecognizer.recognize(query, QnaKnbUrl, 'EndpointKey ' + qnaAPIKey, 'Authorization', 1, 'OnDevice.Help', (error, results) => {
+            if (results === undefined) {
+                console.log(util.inspect(error.stack, {showHidden: false, depth: null}));
+             }
+            else {
+            session.send(results.answers[0].answer);
+            }    
         });   
         session.endDialog();
     }
