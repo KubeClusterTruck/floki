@@ -20,7 +20,7 @@ var connector = new builder.ChatConnector({
     openIdMetadata: process.env.BotOpenIdMetadata 
 });
 
-// Listen for messages from users 
+// ** Original *** Listen for messages from users 
 server.post('/api/messages', connector.listen());
 
 /*----------------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ const QnaKnbUrl = qnaAPIEndpoint + '/knowledgebases/' + qnaAppId + '/generateAns
 //    endpointHostName: qnaAPIEndpoint
 //});  
 
-// Add both Luis Recognizer
+// Add Luis Recognizer
 bot.recognizer(recognizer);
 
 // Add a dialog for each intent that the LUIS app recognizes.
@@ -115,3 +115,8 @@ bot.dialog('K8sHelpDialog',
 ).triggerAction({
     matches: 'OnDevice.Help'
 })
+
+bot.dialog('k8s-connect', require('./k8s-connect.js'))
+    .triggerAction({
+        matches: [/connect/i, /k8s cluster/i, /reset connection/i]
+});
