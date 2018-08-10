@@ -1,5 +1,6 @@
 var builder = require('botbuilder');
 var k8sClient = require('node-kubernetes-client');
+const util = require('util');
 
 module.exports = [
     // Destination
@@ -47,13 +48,13 @@ module.exports = [
         var k8sclient = new k8sClient({
             host:  k8sHost,
             protocol: 'https',
-            version: 'v1beta2',
+            version: 'v1',
             token: k8sToken
         });
 
-        k8sclient.pods.get(function (err, pods) {
-            if (pods === undefined) {
-                console.log(util.inspect(error.stack, {showHidden: false, depth: null}));
+        k8sclient.nodes.get(function (err, nodes) {
+            if (nodes === undefined) {
+                console.log(util.inspect(err.stack, {showHidden: false, depth: null}));
                 session.send(
                     'Oops, there was an error getting Floki on K8S Ship %s!',
                     k8sShip);
