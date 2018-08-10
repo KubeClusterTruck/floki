@@ -14,7 +14,7 @@ module.exports = [
 
     // Enpoint URL
     function (session) {
-        builder.Prompts.url(session, 'What is your K8S API Endpoint URL?');
+        builder.Prompts.text(session, 'What is your K8S API Endpoint URL?');
     },
     function (session, results, next) {
         session.dialogData.k8sURL = results.response;
