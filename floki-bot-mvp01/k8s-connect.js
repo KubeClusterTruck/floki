@@ -54,7 +54,7 @@ module.exports = [
 
         k8sclient.nodes.get(function (err, nodes) {
             if (nodes === undefined) {
-                console.log(util.inspect(err.stack, {showHidden: false, depth: null}));
+                console.log(util.inspect(err, {showHidden: false, depth: null}));
                 session.send(
                     'Oops, there was an error getting Floki on K8S Ship %s!',
                     k8sShip);
