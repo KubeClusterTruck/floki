@@ -14,7 +14,7 @@ module.exports = [
 
     // Enpoint URL
     function (session) {
-        builder.Prompts.time(session, 'What is your K8S API Endpoint URL?');
+        builder.Prompts.url(session, 'What is your K8S API Endpoint URL?');
     },
     function (session, results, next) {
         session.dialogData.k8sURL = results.response;
@@ -23,7 +23,7 @@ module.exports = [
 
     // Security Token
     function (session) {
-        builder.Prompts.number(session, 'What is a valid Security Token Floki can use?');
+        builder.Prompts.text(session, 'What is a valid Security Token Floki can use?');
     },
     function (session, results, next) {
         session.dialogData.k8sToken = results.response;

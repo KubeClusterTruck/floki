@@ -118,5 +118,5 @@ bot.dialog('K8sHelpDialog',
 
 bot.dialog('k8s-connect', require('./k8s-connect.js'))
     .triggerAction({
-        matches: [/connect/i, /k8s cluster/i, /reset connection/i]
+        matches: [/k8s cluster/i, /reset connection/i]
 });
