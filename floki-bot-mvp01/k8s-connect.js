@@ -1,4 +1,5 @@
 var builder = require('botbuilder');
+var k8sClient = require('node-kubernetes-client');
 
 module.exports = [
     // Destination
@@ -14,10 +15,10 @@ module.exports = [
 
     // Enpoint URL
     function (session) {
-        builder.Prompts.text(session, 'What is your K8S API Endpoint URL?');
+        builder.Prompts.text(session, 'What is your K8S HostName?');
     },
     function (session, results, next) {
-        session.dialogData.k8sURL = results.response;
+        session.dialogData.k8sHost = results.response; 
         next();
     },
 
@@ -33,50 +34,35 @@ module.exports = [
     // Validate K8S Connection...
     function (session) {
         var k8sShip = session.dialogData.k8sShip;
-        var k8sURL = session.dialogData.k8sURL;
+        var k8sHost = session.dialogData.k8sHost;
         var k8sToken = session.dialogData.k8sToken;
 
         session.send(
             'Ok. Floki is boarding K8S Ship %s at %s using Security Token %s...',
             k8sShip,
-            k8sURL,
+            k8sHost,
             k8sToken);
 
-        // Async K8S API Call to test connection
-        //K8SConnect
-        //    .searchHotels(destination, checkIn, checkOut)
-        //    .then(function (hotels) {
-                // Results
-        //        session.send('I found in total %d hotels for your dates:', hotels.length);
+        //AK8S API Call to test connection
+        var k8sclient = new k8sClient({
+            host:  k8sHost,
+            protocol: 'https',
+            version: 'v1beta2',
+            token: k8sToken
+        });
 
-        //        var message = new builder.Message()
-        //            .attachmentLayout(builder.AttachmentLayout.carousel)
-        //            .attachments(hotels.map(hotelAsAttachment));
-
-        //        session.send(message);
-
-                // End
-        //        session.endDialog();
-        //    });
+        k8sclient.pods.get(function (err, pods) {
+            if (pods === undefined) {
+                console.log(util.inspect(error.stack, {showHidden: false, depth: null}));
+                session.send(
+                    'Oops, there was an error getting Floki on K8S Ship %s!',
+                    k8sShip);
+            }
+            else {
+                session.send(
+                    'Good news, Floki has successfully boarded K8S Ship %s!',
+                    k8sShip);
+            }
+        });
     }
 ];
-
-// Helpers
-function hotelAsAttachment(hotel) {
-    return new builder.HeroCard()
-        .title(hotel.name)
-        .subtitle('%d stars. %d reviews. From $%d per night.', hotel.rating, hotel.numberOfReviews, hotel.priceStarting)
-        .images([new builder.CardImage().url(hotel.image)])
-        .buttons([
-            new builder.CardAction()
-                .title('More details')
-                .type('openUrl')
-                .value('https://www.bing.com/search?q=hotels+in+' + encodeURIComponent(hotel.location))
-        ]);
-}
-
-Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
-};

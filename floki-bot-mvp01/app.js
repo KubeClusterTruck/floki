@@ -6,6 +6,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var botbuilder_azure = require("botbuilder-azure");
 var cog = require('botbuilder-cognitiveservices');
+const util = require('util');
 
 // Setup Restify Server
 var server = restify.createServer();
